@@ -1,1 +1,1 @@
-from .cnn import CNN
+from .model import Sequential
