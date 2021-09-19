@@ -1,4 +1,4 @@
-class ReLu():
+class ReLU():
     def __init__(self, inputs):
         self.res = []
         for input in inputs:
