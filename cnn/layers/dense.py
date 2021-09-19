@@ -58,6 +58,7 @@ class Dense:
         self.neurons = [-1] * (self.size + 1)
         self.weights = []
         
+        
     def get_size(self):
         return self.size
     
@@ -84,6 +85,9 @@ class Dense:
     
     def set_activation_type(self, act_type):
         self.activation_type = act_type
+        
+    def init_layer(self):
+        self.init_weights()
     
     def init_weights(self):
         
@@ -95,11 +99,6 @@ class Dense:
         for i in range(len(self.weights)):
             self.weights[i].insert(0, bias_weight)
             self.weights[i] = list(map(lambda x: abs(x), self.weights[i]))
-            
-        print("Init weight")
-        print("size: " + str(self.size))
-        print("input_size: " + str(self.input_size))
-        print(self.weights)
         
     def set_outputs_value_by_matrix(self, hk):
         self.neurons[0] = 1
@@ -119,13 +118,8 @@ class Dense:
     def forward_propagation(self, input_neurons):
         
         input_neurons = list(map(lambda x: [x], input_neurons))
-        print(self.weights)
-        print(input_neurons)
+        
         ak = list(map(lambda x: x[0], Matrix.mult(self.weights, input_neurons)))
         hk = self.activation_function_wrapper(ak)
         
-        print("AK :")
-        print(ak)
-        print("HK :")
-        print(hk)
         self.set_outputs_value_by_matrix(hk)

@@ -1,3 +1,3 @@
 from .dense import Dense
-from .conv import Conv
-from .pooling import Pooling
+from .conv import Conv2D
+from .flatten import Flatten
