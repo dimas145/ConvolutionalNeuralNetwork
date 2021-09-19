@@ -1,7 +1,7 @@
 class Sequential:
     def __init__(self):
         self.layers = []
-        self.state = { "Dense": 0, "Conv2D": 0, "Flatten": 0 }
+        self.state = { "Dense": 0, "Conv2D": 0, "Flatten": 0, "Pooling": 0 }
     
     def add(self, layer):
         if(len(self.layers) != 0):
@@ -20,9 +20,19 @@ class Sequential:
         for i in range(len(X)):
             for k in range(len(self.layers)):
                 if(k == 0):
+                    print("Input Neuron")
+                    print([1] + X[i])
+                    print("Weight")
+                    print(self.layers[k].weights)
                     self.layers[k].forward_propagation([1] + X[i])
                 else:
-                    self.layers[k].forward_propagation(self.layers[k-1].get_input_neurons())
+                    print("Input Neuron")
+                    print([1] + self.layers[k-1].get_input_neurons())
+                    print("Weight")
+                    print(self.layers[k].weights)
+                    self.layers[k].forward_propagation([1] + self.layers[k-1].get_input_neurons())
+            print("Result Neuron")
+            print(self.layers[k].neurons)
                     
     def summary(self):
         col1 = 35
@@ -48,7 +58,7 @@ class Sequential:
                 before = self.layers[i].input_size
                 param = (before + 1) * self.layers[i].size
             elif(layer.get_type() == "Conv2D"):
-                param = self.layers[i].output_shape[3] * (self.layers[i].kernel_size[0] * self.layers[i].kernel_size[1] * self.layers[i].input_shape[2] + 1)
+                param = self.layers[i].output_shape[3] * (self.layers[i].kernel_size[0] * self.layers[i].kernel_size[1] * self.layers[i].input_shape[3] + 1)
             else:
                 param = 0
 
@@ -65,5 +75,5 @@ class Sequential:
             
             total_params += param
         
-        print("Total params: " + str(total_params))
+        print("Total params: " + "{:,}".format(total_params))
         print()

@@ -95,15 +95,14 @@ class Dense:
         self.weights = np.random.normal(0.0, limit, size=(self.size, self.input_size)).tolist()
         
         bias_weight = np.random.normal(0.0, limit)
-        
+
         for i in range(len(self.weights)):
             self.weights[i].insert(0, bias_weight)
             self.weights[i] = list(map(lambda x: abs(x), self.weights[i]))
+            
         
     def set_outputs_value_by_matrix(self, hk):
-        self.neurons[0] = 1
-        for i in range(1, len(self.neurons)):
-            self.neurons[i] = hk[i-1]
+            self.neurons = hk
 
     def activation_function_wrapper(self, ak):
         if(self.activation_type == "linear"):
@@ -121,5 +120,5 @@ class Dense:
         
         ak = list(map(lambda x: x[0], Matrix.mult(self.weights, input_neurons)))
         hk = self.activation_function_wrapper(ak)
-        
+
         self.set_outputs_value_by_matrix(hk)

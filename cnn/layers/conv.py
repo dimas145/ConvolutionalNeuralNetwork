@@ -1,7 +1,7 @@
 import numpy as np
 
 class Conv2D:
-    def __init__(self, filters, kernel_size, name="conv2d", strides=(1, 1), padding=(0, 0), input_shape=None, activation="relu", pool_mode=None, pool_size=(2,2), pool_strides=None, pool_padding=(0, 0)):
+    def __init__(self, filters, kernel_size, name="conv2d", strides=(1, 1), padding=(0, 0), input_shape=None, activation="relu"):
         self.type = "Conv2D"
         self.name = name
         
@@ -10,10 +10,6 @@ class Conv2D:
         self.strides = strides
         self.padding = padding
         self.activation = activation
-        
-        self.pool_mode = pool_mode
-        self.pool_strides = pool_strides
-        self.pool_padding = pool_padding
         
         self.input_shape = input_shape
         
@@ -38,11 +34,17 @@ class Conv2D:
         self.name = name
     
     def calculate_output_spatial_size(self):
-        W = self.input_shape[0]
+        
+        if(self.input_shape[0] is not None):
+            self.input_shape = (None, self.input_shape[0], self.input_shape[1], self.input_shape[2])
+        W = self.input_shape[1]
         F = self.kernel_size[0]
         P = self.padding[0]
         S = self.strides[0]
         K = self.filters
+        
         V = round(((W - F + (2 * P))/S) + 1)
         
         self.output_shape = (None, V, V, K)
+    
+        
