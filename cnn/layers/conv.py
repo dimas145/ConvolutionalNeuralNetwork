@@ -53,6 +53,8 @@ class Conv2D:
                                  size=(self.kernel_size[1],
                                        self.kernel_size[0])).tolist())
 
+
+    def init_biases(self):
         for _ in range(self.filters):
             self.biases.append([1] * self.kernel_size[0])
 
@@ -161,6 +163,7 @@ class Conv2D:
         width = len(matrix[0])
 
         conv = []
+        self.init_biases()
 
         for z in range(self.filters):
             temp2 = []
