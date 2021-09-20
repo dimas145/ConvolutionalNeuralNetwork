@@ -28,7 +28,7 @@ if __name__ == "__main__":
     modelz.add(layers.Flatten())
     modelz.add(layers.Dense(120, activation=activations.ReLU))
     modelz.add(layers.Dense(84, activation=activations.ReLU))     
-    modelz.add(layers.Dense(10))
+    modelz.add(layers.Dense(10, activation=activations.Softmax))
 
     modelz.summary()
         

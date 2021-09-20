@@ -35,6 +35,7 @@ class Conv2D:
 
         self.neurons = []
         self.weights = []
+        self.biases = []
 
     def init_layer(self):
         self.calculate_output_spatial_size()
@@ -52,8 +53,8 @@ class Conv2D:
                                  size=(self.kernel_size[1],
                                        self.kernel_size[0])).tolist())
 
-    def init_layer(self):
-        self.calculate_output_spatial_size()
+        for _ in range(self.filters):
+            self.biases.append([1] * self.kernel_size[0])
 
     @property
     def size(self):
@@ -172,6 +173,7 @@ class Conv2D:
                     for k in range(self.kernel_size[0]):
                         for l in range(self.kernel_size[1]):
                             sum += matrix[i + k][j + l] * self.weights[z][k][l]
+                        sum += self.biases[z][k]
                     temp1.append(sum)
                 temp2.append(temp1)
             conv.append(temp2)
