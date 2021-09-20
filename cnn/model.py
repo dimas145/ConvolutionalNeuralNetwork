@@ -28,27 +28,26 @@ class Sequential:
 
         self.layers.append(layer)
 
-    def fit(self, X, y):
-        for i in range(len(X)):
-            for k in range(len(self.layers)):
-                if (type(self.layers[k]) == Dense):
-                    if (k == 0):
-                        self.layers[k].forward_propagation([0] + X[i])
-                    else:
-                        self.layers[k].forward_propagation(
-                            [0] + self.layers[k - 1].get_input_neurons())
-                elif (type(self.layers[k]) == Conv2D):
-                    if (k == 0):
-                        self.layers[k].forward_propagation(X[i])
-                    else:
-                        self.layers[k].forward_propagation(
-                            self.layers[k - 1].get_input_neurons())
-                elif (type(self.layers[k]) == Flatten):
-                    self.layers[k].flattening(
+    def forward_propagation(self, X):
+        for k in range(len(self.layers)):
+            if (type(self.layers[k]) == Dense):
+                if (k == 0):
+                    self.layers[k].forward_propagation([0] + X)
+                else:
+                    self.layers[k].forward_propagation(
+                        [0] + self.layers[k - 1].get_input_neurons())
+            elif (type(self.layers[k]) == Conv2D):
+                if (k == 0):
+                    self.layers[k].forward_propagation(X)
+                else:
+                    self.layers[k].forward_propagation(
                         self.layers[k - 1].get_input_neurons())
-                elif (type(self.layers[k]) == Pooling):
-                    self.layers[k].pooling(self.layers[k -
-                                                       1].get_input_neurons())
+            elif (type(self.layers[k]) == Flatten):
+                self.layers[k].flattening(
+                    self.layers[k - 1].get_input_neurons())
+            elif (type(self.layers[k]) == Pooling):
+                self.layers[k].pooling(self.layers[k -
+                                                   1].get_input_neurons())
 
     def summary(self):
         col1 = 35
