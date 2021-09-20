@@ -35,6 +35,7 @@ class Conv2D:
 
         self.neurons = []
         self.weights = []
+        self.biases = []
 
     def init_layer(self):
         self.calculate_output_spatial_size()
@@ -52,8 +53,10 @@ class Conv2D:
                                  size=(self.kernel_size[1],
                                        self.kernel_size[0])).tolist())
 
-    def init_layer(self):
-        self.calculate_output_spatial_size()
+
+    def init_biases(self):
+        for _ in range(self.filters):
+            self.biases.append([1] * self.kernel_size[0])
 
     @property
     def size(self):
@@ -93,6 +96,8 @@ class Conv2D:
         self.output_shape = (None, V, V, K)
 
     def add_auto_padding(self, matrix):
+
+
         height = len(matrix)
         width = len(matrix[0])
 
@@ -130,6 +135,7 @@ class Conv2D:
         return matrix
 
     def add_padding(self, matrix):
+        
         height = len(matrix)
         width = len(matrix[0])
 
@@ -153,6 +159,12 @@ class Conv2D:
         return matrix
 
     def convolution(self, matrix):
+
+        print("Before Convolution")
+        print(len(matrix))
+        print(len(matrix[0]))
+        print(len(matrix[0]))
+
         matrix = self.add_auto_padding(matrix)
         matrix = self.add_padding(matrix)
 
@@ -160,6 +172,7 @@ class Conv2D:
         width = len(matrix[0])
 
         conv = []
+        self.init_biases()
 
         for z in range(self.filters):
             temp2 = []
@@ -172,27 +185,43 @@ class Conv2D:
                     for k in range(self.kernel_size[0]):
                         for l in range(self.kernel_size[1]):
                             sum += matrix[i + k][j + l] * self.weights[z][k][l]
+                        sum += self.biases[z][k]
                     temp1.append(sum)
                 temp2.append(temp1)
             conv.append(temp2)
+        print("Convo Res")
+        print(len(conv))
 
         return conv
 
     def detector(self, matrix):
+        print("Convo Res")
+        print(len([self._activation(row).result for row in matrix]))
         return [self._activation(row).result for row in matrix]
 
+
     def forward_propagation(self, input_neurons):
-        convoluted = [
-            self.convolution(input_neurons[i])
-            for i in range(len(input_neurons))
-        ]
+
+        print("Before Convo")
+        print(len(input_neurons))
+        print(len(input_neurons[0]))
+        print(len(input_neurons[0][0]))
+
+
+        convoluted = []
+        for i in range(len(input_neurons)):
+            convoluted.append(self.convolution(input_neurons[i]))
 
         detected = []
         for item in convoluted:
             for j in range(len(item)):
                 detected.append(self.detector(item[j]))
 
-        print("Detected")
-        print(np.array(detected))
-
         self.set_outputs_value_by_matrix(detected)
+
+        print(len(self.neurons))
+        print(len(self.neurons[0]))
+        print(len(self.neurons[0][0]))
+        print("Convo")
+        print(self.output_shape)
+        print(len(self.neurons))

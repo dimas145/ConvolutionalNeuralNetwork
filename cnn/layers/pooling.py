@@ -164,6 +164,12 @@ class Pooling:
         return pooled
 
     def pooling(self, matrix):
+
+        print("Before Pooling")
+        print(len(matrix))
+        print(len(matrix[0]))
+        print(len(matrix[0][0]))
+
         if (self.pool_mode == "max"):
             res = [self.max_pooling(matrix[i]) for i in range(len(matrix))]
         elif self.pool_mode == "average":
@@ -171,6 +177,10 @@ class Pooling:
         else:
             raise Exception("Undefined pooling mode!")
 
-        print("Pooling res:")
-        print(np.array(res))
         self.neurons = res
+
+        print(len(self.neurons))
+        print(len(self.neurons[0]))
+        print(len(self.neurons[0][0]))
+        print("Pooling")
+        print(len(self.neurons))

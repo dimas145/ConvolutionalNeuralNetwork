@@ -30,12 +30,21 @@ class Flatten:
     def name(self, name):
         self._name = name
 
+    def get_input_neurons(self):
+        return self.neurons
+
     def set_input_size(self, shape):
         self.input_shape = shape
         self._size = int(self.input_shape[1] * self.input_shape[2] *
                          self.input_shape[3])
 
     def flattening(self, matrix):
+
+        print(len(matrix))
+        print(len(matrix[0]))
+        print(len(matrix[0][0]))
+
+
         flattened = []
 
         for i in range(len(matrix)):
@@ -45,6 +54,6 @@ class Flatten:
 
         self.neurons = flattened
 
-        print("Flattening")
-        print(np.array(matrix))
-        print(np.array(flattened))
+        print("Flatten")
+        print(len(self.neurons))
+

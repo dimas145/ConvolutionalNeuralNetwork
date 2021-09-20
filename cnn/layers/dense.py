@@ -94,13 +94,11 @@ class Dense:
         self.neurons = hk
 
     def forward_propagation(self, input_neurons):
+
+        print(len(input_neurons))
+        print(input_neurons[:4])
+
         input_neurons = list(map(lambda x: [x], input_neurons))
-
-        print("Weight")
-        print(self._weights)
-
-        print("Input Neuron")
-        print(input_neurons)
 
         ak = list(
             map(lambda x: x[0], Matrix.mult(self._weights, input_neurons)))
@@ -108,5 +106,3 @@ class Dense:
 
         self.set_outputs_value_by_matrix(hk)
 
-        print("Dense Result")
-        print(self.neurons)
