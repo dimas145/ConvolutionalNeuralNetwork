@@ -1,4 +1,35 @@
+import math
 import numpy as np
+
+class Activation:
+        
+    def linear(listx):
+        res = []
+        for i in range(len(listx)):
+            res.append(listx[i])
+        return res
+
+    def sigmoid(listx):
+        res = []
+        for i in range(len(listx)):
+            res.append([1/(1+math.exp(-1*listx[i]))])
+        return res
+
+    def softmax(listx):
+        sum = 0
+        listx = list(map(lambda x: math.exp(x), listx))
+        for i in range(len(listx)):
+            sum = sum + listx[i]
+        res = []
+        for i in range(len(listx)):
+            res.append(listx[i]/sum)
+        return res
+
+    def ReLU(listx):
+        res = []
+        for i in range(len(listx)):
+            res.append(max(0, listx[i]))
+        return res
 
 class Conv2D:
     def __init__(self, filters, kernel_size, name="conv2d", strides=(1, 1), padding=(0, 0), input_shape=None, activation="relu"):
