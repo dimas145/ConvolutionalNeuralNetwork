@@ -40,11 +40,6 @@ class Flatten:
 
     def flattening(self, matrix):
 
-        print(len(matrix))
-        print(len(matrix[0]))
-        print(len(matrix[0][0]))
-
-
         flattened = []
 
         for i in range(len(matrix)):
@@ -54,6 +49,4 @@ class Flatten:
 
         self.neurons = flattened
 
-        print("Flatten")
-        print(len(self.neurons))
 

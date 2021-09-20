@@ -137,7 +137,6 @@ class Conv2D:
     def add_padding(self, matrix):
         
         height = len(matrix)
-        width = len(matrix[0])
 
         left_padding = self.padding[1]
         right_padding = self.padding[1]
@@ -160,11 +159,6 @@ class Conv2D:
 
     def convolution(self, matrix):
 
-        print("Before Convolution")
-        print(len(matrix))
-        print(len(matrix[0]))
-        print(len(matrix[0]))
-
         matrix = self.add_auto_padding(matrix)
         matrix = self.add_padding(matrix)
 
@@ -172,7 +166,7 @@ class Conv2D:
         width = len(matrix[0])
 
         conv = []
-        self.init_biases()
+        # self.init_biases()
 
         for z in range(self.filters):
             temp2 = []
@@ -185,43 +179,34 @@ class Conv2D:
                     for k in range(self.kernel_size[0]):
                         for l in range(self.kernel_size[1]):
                             sum += matrix[i + k][j + l] * self.weights[z][k][l]
-                        sum += self.biases[z][k]
+                        # sum += self.biases[z][k]
                     temp1.append(sum)
                 temp2.append(temp1)
             conv.append(temp2)
-        print("Convo Res")
-        print(len(conv))
+
+
 
         return conv
 
     def detector(self, matrix):
-        print("Convo Res")
-        print(len([self._activation(row).result for row in matrix]))
         return [self._activation(row).result for row in matrix]
 
 
     def forward_propagation(self, input_neurons):
+    
 
-        print("Before Convo")
-        print(len(input_neurons))
-        print(len(input_neurons[0]))
-        print(len(input_neurons[0][0]))
-
-
-        convoluted = []
-        for i in range(len(input_neurons)):
-            convoluted.append(self.convolution(input_neurons[i]))
+        convoluted = self.convolution(input_neurons[0])
+        for i in range(1, len(input_neurons)):
+            temp = self.convolution(input_neurons[i])
+            for j in range(len(convoluted)):
+                for k in range(len(convoluted[j])):
+                    for l in range(len(convoluted[j][k])):
+                        convoluted[j][k][l] += temp[j][k][l]
+       
 
         detected = []
         for item in convoluted:
-            for j in range(len(item)):
-                detected.append(self.detector(item[j]))
+            detected.append(self.detector(item))
 
         self.set_outputs_value_by_matrix(detected)
 
-        print(len(self.neurons))
-        print(len(self.neurons[0]))
-        print(len(self.neurons[0][0]))
-        print("Convo")
-        print(self.output_shape)
-        print(len(self.neurons))

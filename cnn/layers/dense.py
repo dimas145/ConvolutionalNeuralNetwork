@@ -95,8 +95,6 @@ class Dense:
 
     def forward_propagation(self, input_neurons):
 
-        print(len(input_neurons))
-        print(input_neurons[:4])
 
         input_neurons = list(map(lambda x: [x], input_neurons))
 
