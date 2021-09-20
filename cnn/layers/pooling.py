@@ -149,7 +149,9 @@ class Pooling:
                 res.append(self.average_pooling(matrix[i]))
         else:
             raise Exception("False pooling mode!")
-            
+        
+        print("Pooling res:")
+        print(np.array(res))
         self.neurons = res
     
     def get_size(self):
@@ -160,6 +162,9 @@ class Pooling:
     
     def get_name(self):
         return self.name
+
+    def get_input_neurons(self):
+        return self.neurons
     
     def set_input_size(self, shape):
         self.input_shape = shape

@@ -1,3 +1,4 @@
+
 class Sequential:
     def __init__(self):
         self.layers = []
@@ -9,7 +10,7 @@ class Sequential:
         
         self.state[layer.get_type()] += 1
         
-        if(layer.get_name() == "dense" or layer.get_name() == "conv2d" or layer.get_name() == "flatten"):
+        if(layer.get_name() == "dense" or layer.get_name() == "conv2d" or layer.get_name() == "flatten" or layer.get_name() == "pooling"):
             layer.set_name(layer.get_name() + "_" + str(self.state[layer.get_type()]))
         
         layer.init_layer()
@@ -19,20 +20,20 @@ class Sequential:
     def fit(self, X, y):
         for i in range(len(X)):
             for k in range(len(self.layers)):
-                if(k == 0):
-                    print("Input Neuron")
-                    print([1] + X[i])
-                    print("Weight")
-                    print(self.layers[k].weights)
-                    self.layers[k].forward_propagation([1] + X[i])
-                else:
-                    print("Input Neuron")
-                    print([1] + self.layers[k-1].get_input_neurons())
-                    print("Weight")
-                    print(self.layers[k].weights)
-                    self.layers[k].forward_propagation([1] + self.layers[k-1].get_input_neurons())
-            print("Result Neuron")
-            print(self.layers[k].neurons)
+                if(self.layers[k].get_type() == "Dense"):
+                    if(k == 0):
+                        self.layers[k].forward_propagation([0] + X[i])
+                    else:
+                        self.layers[k].forward_propagation([0] + self.layers[k-1].get_input_neurons())
+                elif(self.layers[k].get_type() == "Conv2D"):
+                    if(k == 0):
+                        self.layers[k].forward_propagation(X[i])
+                    else:
+                        self.layers[k].forward_propagation(self.layers[k-1].get_input_neurons())
+                elif(self.layers[k].get_type() == "Flatten"):
+                    self.layers[k].flattening(self.layers[k-1].get_input_neurons())
+                elif(self.layers[k].get_type() == "Pooling"):
+                    self.layers[k].pooling(self.layers[k-1].get_input_neurons())
                     
     def summary(self):
         col1 = 35

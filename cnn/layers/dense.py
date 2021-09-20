@@ -77,6 +77,9 @@ class Dense:
     def set_name(self, name):
         self.name = name
         
+    def set_weights(self, weights):
+        self.weights = weights
+        
     def add_neuron(self, neuron):
         self.neurons.append(neuron)
         
@@ -98,11 +101,10 @@ class Dense:
 
         for i in range(len(self.weights)):
             self.weights[i].insert(0, bias_weight)
-            self.weights[i] = list(map(lambda x: abs(x), self.weights[i]))
             
         
     def set_outputs_value_by_matrix(self, hk):
-            self.neurons = hk
+        self.neurons = hk
 
     def activation_function_wrapper(self, ak):
         if(self.activation_type == "linear"):
@@ -118,7 +120,16 @@ class Dense:
         
         input_neurons = list(map(lambda x: [x], input_neurons))
         
+        print("Weight")
+        print(self.weights)
+        
+        print("Input Neuron")
+        print(input_neurons)
+        
         ak = list(map(lambda x: x[0], Matrix.mult(self.weights, input_neurons)))
         hk = self.activation_function_wrapper(ak)
 
         self.set_outputs_value_by_matrix(hk)
+        
+        print("Dense Result")
+        print(self.neurons)
