@@ -33,8 +33,8 @@ class Dense:
         self.output_shape = (None, size)
         self.input_size = input_size
 
-        if type(activation) not in [ReLU, Sigmoid, Softmax]:
-            raise "Undefined activation"
+        if activation not in [ReLU, Sigmoid, Softmax]:
+            raise Exception("Undefined activation")
         self._activation = activation
 
         self.neurons = [-1] * (self._size + 1)

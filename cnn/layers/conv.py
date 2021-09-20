@@ -1,4 +1,5 @@
 import numpy as np
+from cnn import activations
 from cnn.activations import (
     ReLU,
     Sigmoid,
@@ -19,8 +20,8 @@ class Conv2D:
     ):
         self._name = name
 
-        if type(activation) not in [ReLU, Sigmoid, Softmax]:
-            raise "Undefined activation"
+        if activation not in [ReLU, Sigmoid, Softmax]:
+            raise Exception("Undefined activation")
         self._activation = activation
 
         self.filters = filters
