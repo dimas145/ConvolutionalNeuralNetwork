@@ -2,8 +2,10 @@ import cnn
 from cnn import layers
 from cnn import activations
 
-from keras.datasets import mnist    
 import numpy as np
+
+# for testing
+from keras.datasets import mnist
 import matplotlib.pyplot as plt
 
 
@@ -47,12 +49,27 @@ def test_lenet_5():
 
 def test_forward():
     x = [
-        [[4, 1, 3, 5, 3], [2, 1, 1, 2, 2], [5, 5, 1, 2, 3], [2, 2, 4, 3, 2],
-         [5, 1, 3, 4, 5]],
+        [
+            [4, 1, 3, 5, 3],
+            [2, 1, 1, 2, 2],
+            [5, 5, 1, 2, 3],
+            [2, 2, 4, 3, 2],
+            [5, 1, 3, 4, 5],
+        ],
     ]
 
-    w = [[[1, 2, 3], [4, 7, 5], [3, -32, 25]],
-         [[12, 18, 12], [18, -74, 45], [-92, 45, -18]]]
+    w = [
+        [
+            [1, 2, 3],
+            [4, 7, 5],
+            [3, -32, 25],
+        ],
+        [
+            [12, 18, 12],
+            [18, -74, 45],
+            [-92, 45, -18],
+        ],
+    ]
 
     conv2d = layers.Conv2D(2, (3, 3),
                            activation=activations.ReLU,
@@ -101,21 +118,16 @@ def test_forward():
 
     dense_2.forward_propagation([0] + dense_1.neurons)
 
+
 def test_mnist():
-
-
     img_rows, img_cols = 28, 28
 
     (X_train, y_train), (X_test, y_test) = mnist.load_data()
-
-
     X_train = np.array(X_train[:2])
-
-    X_train = np.pad(X_train, ((0,0),(2,2),(2,2)), 'constant').tolist()
-
+    X_train = np.pad(X_train, ((0, 0), (2, 2), (2, 2)), 'constant').tolist()
 
     for i in range(2):
-        plt.subplot(3, 3, i+1)
+        plt.subplot(3, 3, i + 1)
         plt.imshow(X_train[i], cmap='gray')
         plt.axis('off')
 
@@ -124,19 +136,29 @@ def test_mnist():
 
     lenet5 = cnn.Sequential()
 
-    lenet5.add(layers.Conv2D(6, (5, 5), activation=activations.ReLU, input_shape=(32, 32, 1)))
+    lenet5.add(
+        layers.Conv2D(6, (5, 5),
+                      activation=activations.ReLU,
+                      input_shape=(32, 32, 1)))
     lenet5.add(layers.Pooling(pool_mode="average"))
     lenet5.add(layers.Conv2D(16, (3, 3), activation=activations.ReLU))
     lenet5.add(layers.Pooling(pool_mode="average"))
     lenet5.add(layers.Flatten())
     lenet5.add(layers.Dense(120, activation=activations.ReLU))
-    lenet5.add(layers.Dense(84, activation=activations.ReLU))     
-    lenet5.add(layers.Dense(10, activation=activations.ReLU))
+    lenet5.add(layers.Dense(84, activation=activations.ReLU))
+    lenet5.add(layers.Dense(10, activation=activations.Softmax))
 
     lenet5.summary()
 
-    lenet5.fit(X_train, y_train)
+    X_train = list(map(lambda x: [x], X_train))
 
+    lenet5.forward_propagation(X_train[0])
+    print(lenet5.layers[-1].neurons)
+    print()
+
+    lenet5.forward_propagation(X_train[1])
+    print(lenet5.layers[-1].neurons)
+    print()
 
 
 if __name__ == "__main__":
