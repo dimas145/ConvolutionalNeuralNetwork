@@ -1,9 +1,9 @@
 class ReLU():
     def __init__(self, inputs):
-        self.res = []
+        self._result = []
         for input in inputs:
-            self.res.append(max(input, 0))
+            self._result.append(max(input, 0))
 
     @property
     def result(self):
-        return self.res
+        return self._result

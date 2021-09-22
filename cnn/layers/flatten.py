@@ -6,20 +6,18 @@ class Flatten:
         self._name = name
 
         self._size = 0
-        self.neurons = []
-
-        self.input_shape = None
-
-        self.output_shape = (None, self._size)
+        self._input_neurons = []
+        self._input_shape = None
+        self._output_shape = (None, self._size)
 
     def init_layer(self):
-        self.output_shape = (None, self.input_shape[1] * self.input_shape[2] *
-                             self.input_shape[3])
-        self._size = int(self.input_shape[1] * self.input_shape[2] *
-                         self.input_shape[3])
+        self._output_shape = (None, self._input_shape[1] *
+                              self._input_shape[2] * self._input_shape[3])
+        self._size = int(self._input_shape[1] * self._input_shape[2] *
+                         self._input_shape[3])
 
     @property
-    def size(self):
+    def output_size(self):
         return self._size
 
     @property
@@ -30,16 +28,21 @@ class Flatten:
     def name(self, name):
         self._name = name
 
-    def get_input_neurons(self):
-        return self.neurons
+    @property
+    def input_neurons(self):
+        return self._input_neurons
 
-    def set_input_size(self, shape):
-        self.input_shape = shape
-        self._size = int(self.input_shape[1] * self.input_shape[2] *
-                         self.input_shape[3])
+    @property
+    def input_size(self):
+        return self._input_shape
+
+    @input_size.setter
+    def input_size(self, shape):
+        self._input_shape = shape
+        self._size = int(self._input_shape[1] * self._input_shape[2] *
+                         self._input_shape[3])
 
     def flattening(self, matrix):
-
         flattened = []
 
         for i in range(len(matrix)):
@@ -47,6 +50,4 @@ class Flatten:
                 for k in range(len(matrix[i][j])):
                     flattened.append(matrix[i][j][k])
 
-        self.neurons = flattened
-
-
+        self._input_neurons = flattened

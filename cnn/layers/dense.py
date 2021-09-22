@@ -23,21 +23,21 @@ class Matrix:
 class Dense:
     def __init__(
         self,
-        size,
+        output_size,
         name="dense",
         activation=None,
         input_size=10,
     ):
         self._name = name
-        self._size = size
-        self.output_shape = (None, size)
-        self.input_size = input_size
+        self._output_size = output_size
+        self._output_shape = (None, output_size)
+        self._input_size = input_size
 
         if activation not in [ReLU, Sigmoid, Softmax]:
             raise Exception("Undefined activation")
         self._activation = activation
 
-        self.neurons = [-1] * (self._size + 1)
+        self._input_neurons = [-1] * (self._output_size + 1)
         self._weights = []
 
     @property
@@ -45,8 +45,24 @@ class Dense:
         return self._activation
 
     @property
+    def output_size(self):
+        return self._output_size
+
+    @property
+    def output_shape(self):
+        return self._output_shape
+
+    @property
+    def input_size(self):
+        return self._input_size
+
+    @input_size.setter
+    def input_size(self, input_size):
+        self._input_size = input_size
+
+    @property
     def size(self):
-        return self._size
+        return self._output_size
 
     @property
     def name(self):
@@ -64,38 +80,28 @@ class Dense:
     def weights(self, weights):
         self._weights = weights
 
-    def get_input_neurons(self):
-        return self.neurons
-
-    def set_input_size(self, size):
-        self.input_size = size
-
-    def add_neuron(self, neuron):
-        self.neurons.append(neuron)
-
-    def n_neurons(self):
-        return len(self.neurons)
+    @property
+    def input_neurons(self):
+        return self._input_neurons
 
     def init_layer(self):
         self.init_weights()
 
     def init_weights(self):
-        limit = np.sqrt(1 / float(self.input_size))
+        limit = np.sqrt(1 / float(self._input_size))
         self._weights = np.random.normal(0.0,
                                          limit,
-                                         size=(self._size,
-                                               self.input_size)).tolist()
+                                         size=(self._output_size,
+                                               self._input_size)).tolist()
         bias_weight = np.random.normal(0.0, limit)
 
         for i in range(len(self._weights)):
             self._weights[i].insert(0, bias_weight)
 
     def set_outputs_value_by_matrix(self, hk):
-        self.neurons = hk
+        self._input_neurons = hk
 
     def forward_propagation(self, input_neurons):
-
-
         input_neurons = list(map(lambda x: [x], input_neurons))
 
         ak = list(
@@ -103,4 +109,3 @@ class Dense:
         hk = self._activation(ak).result
 
         self.set_outputs_value_by_matrix(hk)
-

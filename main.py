@@ -57,7 +57,6 @@ def test_forward():
             [5, 1, 3, 4, 5],
         ],
     ]
-
     w = [
         [
             [1, 2, 3],
@@ -75,11 +74,11 @@ def test_forward():
                            activation=activations.ReLU,
                            input_shape=(5, 5, 1))
 
-    conv2d.weights = w
+    conv2d._weights = w
 
     conv2d.forward_propagation(x)
 
-    x = conv2d.neurons
+    x = conv2d.input_neurons
 
     pooling = layers.Pooling(pool_mode="max",
                              pool_size=(3, 3),
@@ -89,7 +88,7 @@ def test_forward():
 
     flatten = layers.Flatten()
 
-    flatten.flattening(pooling.neurons)
+    flatten.flattening(pooling.input_neurons)
 
     dw1 = [[0, 1, 3], [0, 2, -4]]
 
@@ -97,7 +96,7 @@ def test_forward():
 
     dense_1.weights = dw1
 
-    dense_1.forward_propagation([0] + flatten.neurons)
+    dense_1.forward_propagation([0] + flatten.input_neurons)
 
     dense_2 = layers.Dense(10, activation=activations.Softmax)
 
@@ -116,7 +115,7 @@ def test_forward():
 
     dense_2.weights = dw2
 
-    dense_2.forward_propagation([0] + dense_1.neurons)
+    dense_2.forward_propagation([0] + dense_1.input_neurons)
 
 
 def test_mnist():
@@ -153,11 +152,11 @@ def test_mnist():
     X_train = list(map(lambda x: [x], X_train))
 
     lenet5.forward_propagation(X_train[0])
-    print(lenet5.layers[-1].neurons)
+    print(lenet5.layers[-1].input_neurons)
     print()
 
     lenet5.forward_propagation(X_train[1])
-    print(lenet5.layers[-1].neurons)
+    print(lenet5.layers[-1].input_neurons)
     print()
 
 

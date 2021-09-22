@@ -17,7 +17,7 @@ class Sequential:
 
     def add(self, layer):
         if (len(self.layers) != 0):
-            layer.set_input_size(self.layers[-1].size)
+            layer.input_size = self.layers[-1].output_size
 
         self.state[type(layer)] += 1
 
@@ -35,19 +35,19 @@ class Sequential:
                     self.layers[k].forward_propagation([0] + X)
                 else:
                     self.layers[k].forward_propagation(
-                        [0] + self.layers[k - 1].get_input_neurons())
+                        [0] + self.layers[k - 1].input_neurons)
             elif (type(self.layers[k]) == Conv2D):
                 if (k == 0):
                     self.layers[k].forward_propagation(X)
                 else:
                     self.layers[k].forward_propagation(
-                        self.layers[k - 1].get_input_neurons())
+                        self.layers[k - 1].input_neurons)
             elif (type(self.layers[k]) == Flatten):
                 self.layers[k].flattening(
-                    self.layers[k - 1].get_input_neurons())
+                    self.layers[k - 1].input_neurons)
             elif (type(self.layers[k]) == Pooling):
                 self.layers[k].pooling(self.layers[k -
-                                                   1].get_input_neurons())
+                                                   1].input_neurons)
 
     def summary(self):
         col1 = 35
@@ -69,9 +69,9 @@ class Sequential:
 
             if (type(layer) == Dense):
                 before = self.layers[i].input_size
-                param = (before + 1) * self.layers[i].size
+                param = (before + 1) * self.layers[i].output_size
             elif (type(layer) == Conv2D):
-                param = self.layers[i].output_shape[3] * (
+                param = self.layers[i].output_size[3] * (
                     self.layers[i].kernel_size[0] *
                     self.layers[i].kernel_size[1] *
                     self.layers[i].input_shape[3] + 1)
@@ -80,7 +80,7 @@ class Sequential:
 
             col1_text = self.layers[i].name + " " + "(" + type(
                 self.layers[i]).__name__ + ")"
-            col2_text = str(self.layers[i].output_shape)
+            col2_text = str(self.layers[i].output_size)
             col3_text = str(param)
 
             print(col1_text + " " * (col1 - len(col1_text)) + col2_text + " " *
