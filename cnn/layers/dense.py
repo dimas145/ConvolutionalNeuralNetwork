@@ -1,10 +1,10 @@
 import numpy as np
+import math
 from cnn.activations import (
     ReLU,
     Sigmoid,
     Softmax,
 )
-
 
 class Matrix:
     def add(mat1, mat2):
@@ -101,7 +101,7 @@ class Dense:
     def set_outputs_value_by_matrix(self, hk):
         self._input_neurons = hk
 
-    def forward_propagation(self, input_neurons):
+    def forward_propagation(self, input_neurons, y=0):
         input_neurons = list(map(lambda x: [x], input_neurons))
 
         ak = list(

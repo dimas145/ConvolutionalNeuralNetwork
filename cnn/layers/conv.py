@@ -41,7 +41,7 @@ class Conv2D:
         self.init_weights()
 
     def init_weights(self):
-        # weight (kernel[0] * kernel[1] * filters)
+
         limit = np.sqrt(1 / float(self._input_shape[1] * self._input_shape[2] *
                                   self._input_shape[3]))
 
@@ -54,7 +54,7 @@ class Conv2D:
 
     def init_biases(self):
         for _ in range(self._filters):
-            self._biases.append([1] * self._kernel_size[0])
+            self._biases.append([0] * self._kernel_size[0])
 
     @property
     def output_size(self):

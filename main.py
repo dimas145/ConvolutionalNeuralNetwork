@@ -152,11 +152,11 @@ def test_mnist():
     X_train = list(map(lambda x: [x], X_train))
 
     lenet5.forward_propagation(X_train[0])
-    print(lenet5.layers[-1].input_neurons)
+    print(np.array(lenet5.layers[-1].input_neurons))
     print()
 
     lenet5.forward_propagation(X_train[1])
-    print(lenet5.layers[-1].input_neurons)
+    print(np.array(lenet5.layers[-1].input_neurons))
     print()
 
 

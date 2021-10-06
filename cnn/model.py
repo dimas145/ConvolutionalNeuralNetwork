@@ -1,3 +1,8 @@
+import sys
+import time
+import math
+import numpy as np
+
 from .layers import (
     Dense,
     Conv2D,
@@ -14,6 +19,7 @@ class Sequential:
                 self.add(layer)
 
         self.state = {Dense: 0, Conv2D: 0, Flatten: 0, Pooling: 0}
+        self.loss = sys.maxsize
 
     def add(self, layer):
         if (len(self.layers) != 0):
@@ -28,26 +34,28 @@ class Sequential:
 
         self.layers.append(layer)
 
-    def forward_propagation(self, X):
+    def forward_propagation(self, X, y=0):
         for k in range(len(self.layers)):
             if (type(self.layers[k]) == Dense):
                 if (k == 0):
                     self.layers[k].forward_propagation([0] + X)
                 else:
-                    self.layers[k].forward_propagation(
-                        [0] + self.layers[k - 1].input_neurons)
+                    self.layers[k].forward_propagation([0] + self.layers[k - 1].input_neurons)
             elif (type(self.layers[k]) == Conv2D):
                 if (k == 0):
                     self.layers[k].forward_propagation(X)
                 else:
-                    self.layers[k].forward_propagation(
-                        self.layers[k - 1].input_neurons)
+                    self.layers[k].forward_propagation(self.layers[k - 1].input_neurons)
             elif (type(self.layers[k]) == Flatten):
-                self.layers[k].flattening(
-                    self.layers[k - 1].input_neurons)
+                self.layers[k].flattening(self.layers[k - 1].input_neurons)
             elif (type(self.layers[k]) == Pooling):
-                self.layers[k].pooling(self.layers[k -
-                                                   1].input_neurons)
+                self.layers[k].pooling(self.layers[k - 1].input_neurons)
+        self.loss = math.log(self.layers[-1].input_neurons[y])
+        print("LOSS")
+        print(self.loss)
+
+    def backward_propagation(self):
+        pass
 
     def summary(self):
         col1 = 35
@@ -80,7 +88,10 @@ class Sequential:
 
             col1_text = self.layers[i].name + " " + "(" + type(
                 self.layers[i]).__name__ + ")"
-            col2_text = str(self.layers[i].output_size)
+            if (type(layer) == Dense or type(layer) == Flatten):
+                col2_text = str((None, self.layers[i].output_size))
+            else:
+                col2_text = str(self.layers[i].output_size)
             col3_text = str(param)
 
             print(col1_text + " " * (col1 - len(col1_text)) + col2_text + " " *
@@ -96,3 +107,33 @@ class Sequential:
 
         print("Total params: " + "{:,}".format(total_params))
         print()
+
+    def fit(self, X_train, y_train, batch_size=128, epochs=15):
+
+        if(len(X_train) < batch_size):
+            batch_size = len(X_train)
+        
+        batch = len(X_train) // batch_size
+
+        for i in range(epochs):
+            sys.stdout.write("Epoch " + str(i+1) + "/" + str(epochs) + '\n')
+            sys.stdout.flush()
+            for j in range(batch):
+
+                if(j < batch - 1):
+                    loading = ("[" + "=" * int(((j+1) / batch ) * 30)) + "> "
+                    sys.stdout.write("[" + str(j+1) + "/" + str(batch) + "] " + loading + '\r')
+                else:
+                    loading = ("[" + "=" * int(((j+1) / batch ) * 30)) + "] "
+                    sys.stdout.write("[" + str(j+1) + "/" + str(batch) + "] " + loading + '\n')
+                sys.stdout.flush()
+                time.sleep(0.1)
+    
+    def weights_summary(self):
+        for i in range(len(self.layers)):
+            if(type(self.layers[i]) == Dense or type(self.layers[i]) == Conv2D):
+                w = np.array(self.layers[i]._weights)
+                print(self.layers[i]._name + " " + str(w.shape))
+                print(w)
+            
+        
