@@ -1,10 +1,77 @@
 import numpy as np
+import copy
 from cnn.activations import (
     ReLU,
     Sigmoid,
     Softmax,
 )
 
+class Utils:
+    
+    def dE_dnet(loss, y):
+        _loss = copy.copy(loss)
+        _loss[y] = - (1 - _loss[y])
+        return _loss
+
+    def ReLU_X(X):
+        res = copy.copy(X)
+        for x in np.nditer(res, op_flags=['readwrite']):
+           x[...] = 1 if x > 0  else 0
+        return res
+
+    def X_ReLU(X, ReLU):
+        _X = copy.copy(X)
+        _ReLU = copy.copy(ReLU)
+        for i in range(len(_ReLU)):
+            for j in range(len(_ReLU[i])):
+                for k in range(len(_ReLU[i][j])):
+                    _ReLU[i][j][k] = 1 if _ReLU[i][j][k] == _X[i] else 0                    
+        return _ReLU
+
+    def constant_mult_matrix(m1, m2):
+        resi = []
+        for i in range(len(m2)):
+            resj = []
+            for j in range(len(m2[i])):
+                resk = []
+                for k in range(len(m2[i][j])):
+                    resk.append(m2[i][j][k] * m1[i])
+                resj.append(resk)
+            resi.append(resj)                
+                    
+        return np.array(resi)
+
+    def biases_correction(weights):
+        res = []
+        for i in range(len(weights)):
+            sum = 0
+            for j in range(len(weights[i])):
+                for k in range(len(weights[i][j])):
+                    sum += weights[i][j][k]
+            res.append(sum)
+        return res
+
+    def convolution(matrix, weights, strides):
+        height = len(matrix)
+        width = len(matrix[0])
+
+        conv = []
+
+        for z in range(len(weights)):
+            temp2 = []
+            for i in range(0, height - len(weights[z]) + 1, strides[0]):
+                temp1 = []
+                
+                for j in range(0, width - len(weights[z][i]) + 1, strides[1]):
+                    sum = 0
+                    for k in range(len(weights[z])):
+                        for l in range(len(weights[z][i])):
+                            sum += matrix[i + k][j + l] * weights[z][k][l]
+                    temp1.append(sum)
+                temp2.append(temp1)
+            conv.append(temp2)
+
+        return np.array(conv)
 
 class Conv2D:
     def __init__(
@@ -31,10 +98,18 @@ class Conv2D:
         self._input_shape = input_shape
         self._output_shape = None
 
+        self._input_neurons = []
+        
+        self._nets = []
+
         self._neurons = []
-        self._weights = []
         self._biases = []
 
+        self._weights = []
+        self._dw = None
+
+        self.backward_temp = None
+    
     def init_layer(self):
         self.calculate_output_spatial_size()
         self.init_weights()
@@ -64,8 +139,20 @@ class Conv2D:
         return self._kernel_size
 
     @property
+    def input_neurons(self):
+        return self._input_neurons
+
+    @input_neurons.setter
+    def input_neurons(self, neurons):
+        self._input_neurons = neurons
+
+    @property
     def neurons(self):
         return self._neurons
+
+    @property
+    def nets(self):
+        return self._nets
 
     @property
     def input_shape(self):
@@ -87,8 +174,9 @@ class Conv2D:
     def input_size(self, shape):
         self._input_shape = shape
 
-    def set_outputs_value_by_matrix(self, matrix):
-        self._neurons = matrix
+    def set_outputs_value_by_matrix(self, convoluted, detected):
+        self._nets = convoluted
+        self._neurons = detected
 
     def calculate_output_spatial_size(self):
         if (self._input_shape[0] is not None):
@@ -174,16 +262,13 @@ class Conv2D:
 
         for z in range(self._filters):
             temp2 = []
-            for i in range(0, height - self._kernel_size[0] + 1,
-                           self._strides[0]):
+            for i in range(0, height - self._kernel_size[0] + 1, self._strides[0]):
                 temp1 = []
-                for j in range(0, width - self._kernel_size[1] + 1,
-                               self._strides[1]):
+                for j in range(0, width - self._kernel_size[1] + 1, self._strides[1]):
                     sum = 0
                     for k in range(self._kernel_size[0]):
                         for l in range(self._kernel_size[1]):
-                            sum += matrix[i + k][j +
-                                                 l] * self._weights[z][k][l]
+                            sum += matrix[i + k][j + l] * self._weights[z][k][l]
                         sum += self._biases[z][k]
                     temp1.append(sum)
                 temp2.append(temp1)
@@ -195,6 +280,7 @@ class Conv2D:
         return [self._activation(row).result for row in matrix]
 
     def forward_propagation(self, neurons):
+        self.input_neurons = neurons
         convoluted = self.convolution(neurons[0])
         for i in range(1, len(neurons)):
             temp = self.convolution(neurons[i])
@@ -204,4 +290,19 @@ class Conv2D:
                         convoluted[j][k][l] += temp[j][k][l]
 
         detected = [self.detector(item) for item in convoluted]
-        self.set_outputs_value_by_matrix(detected)
+        self.set_outputs_value_by_matrix(convoluted, detected)
+    
+    def backward_propagation(self, chain_matrix):
+        # print("CHAIN MATRIX")
+        # print(chain_matrix)
+        # print("NEURONS")
+        # print(np.array(self._neurons))
+        # print("NETS")
+        # print(np.array(self._nets))
+        # print("RELU_X")
+        # print(Utils.ReLU_X(np.array(self._neurons)))
+        # print("RESULT")
+        self.backward_temp = Utils.convolution(self._input_neurons[0], chain_matrix * Utils.ReLU_X(np.array(self._neurons)), self._strides) 
+        self._dw = self.backward_temp
+        self._dw_bias = Utils.biases_correction(chain_matrix * Utils.ReLU_X(np.array(self._neurons)))
+        return self._dw, self._dw_bias

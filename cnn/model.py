@@ -121,10 +121,10 @@ class Sequential:
             for j in range(batch):
 
                 if(j < batch - 1):
-                    loading = ("[" + "=" * int(((j+1) / batch ) * 30)) + "> "
+                    loading = ("[" + "=" * int(((j+1) / batch ) * 40)) + "> "
                     sys.stdout.write("[" + str(j+1) + "/" + str(batch) + "] " + loading + '\r')
                 else:
-                    loading = ("[" + "=" * int(((j+1) / batch ) * 30)) + "] "
+                    loading = ("[" + "=" * int(((j+1) / batch ) * 40)) + "] "
                     sys.stdout.write("[" + str(j+1) + "/" + str(batch) + "] " + loading + '\n')
                 sys.stdout.flush()
                 time.sleep(0.1)
