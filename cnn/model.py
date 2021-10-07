@@ -40,17 +40,17 @@ class Sequential:
                 if (k == 0):
                     self.layers[k].forward_propagation([0] + X)
                 else:
-                    self.layers[k].forward_propagation([0] + self.layers[k - 1].input_neurons)
+                    self.layers[k].forward_propagation([0] + self.layers[k - 1].neurons)
             elif (type(self.layers[k]) == Conv2D):
                 if (k == 0):
                     self.layers[k].forward_propagation(X)
                 else:
-                    self.layers[k].forward_propagation(self.layers[k - 1].input_neurons)
+                    self.layers[k].forward_propagation(self.layers[k - 1].neurons)
             elif (type(self.layers[k]) == Flatten):
-                self.layers[k].flattening(self.layers[k - 1].input_neurons)
+                self.layers[k].flattening(self.layers[k - 1].neurons)
             elif (type(self.layers[k]) == Pooling):
-                self.layers[k].pooling(self.layers[k - 1].input_neurons)
-        self.loss = math.log(self.layers[-1].input_neurons[y])
+                self.layers[k].pooling(self.layers[k - 1].neurons)
+        self.loss = math.log(self.layers[-1].neurons[y])
         print("LOSS")
         print(self.loss)
 

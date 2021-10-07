@@ -6,7 +6,7 @@ class Flatten:
         self._name = name
 
         self._size = 0
-        self._input_neurons = []
+        self._neurons = []
         self._input_shape = None
         self._output_shape = (None, self._size)
 
@@ -29,8 +29,8 @@ class Flatten:
         self._name = name
 
     @property
-    def input_neurons(self):
-        return self._input_neurons
+    def neurons(self):
+        return self._neurons
 
     @property
     def input_size(self):
@@ -50,4 +50,4 @@ class Flatten:
                 for k in range(len(matrix[i][j])):
                     flattened.append(matrix[i][j][k])
 
-        self._input_neurons = flattened
+        self._neurons = flattened

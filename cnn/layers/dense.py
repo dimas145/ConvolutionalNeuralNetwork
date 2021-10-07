@@ -37,7 +37,7 @@ class Dense:
             raise Exception("Undefined activation")
         self._activation = activation
 
-        self._input_neurons = [-1] * (self._output_size + 1)
+        self._neurons = [-1] * (self._output_size + 1)
         self._weights = []
 
     @property
@@ -81,8 +81,8 @@ class Dense:
         self._weights = weights
 
     @property
-    def input_neurons(self):
-        return self._input_neurons
+    def neurons(self):
+        return self._neurons
 
     def init_layer(self):
         self.init_weights()
@@ -99,13 +99,13 @@ class Dense:
             self._weights[i].insert(0, bias_weight)
 
     def set_outputs_value_by_matrix(self, hk):
-        self._input_neurons = hk
+        self._neurons = hk
 
-    def forward_propagation(self, input_neurons, y=0):
-        input_neurons = list(map(lambda x: [x], input_neurons))
+    def forward_propagation(self, neurons, y=0):
+        neurons = list(map(lambda x: [x], neurons))
 
         ak = list(
-            map(lambda x: x[0], Matrix.mult(self._weights, input_neurons)))
+            map(lambda x: x[0], Matrix.mult(self._weights, neurons)))
         hk = self._activation(ak).result
 
         self.set_outputs_value_by_matrix(hk)

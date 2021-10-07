@@ -29,10 +29,9 @@ class Conv2D:
         self._padding = padding
 
         self._input_shape = input_shape
-
         self._output_shape = None
 
-        self._input_neurons = []
+        self._neurons = []
         self._weights = []
         self._biases = []
 
@@ -65,8 +64,8 @@ class Conv2D:
         return self._kernel_size
 
     @property
-    def input_neurons(self):
-        return self._input_neurons
+    def neurons(self):
+        return self._neurons
 
     @property
     def input_shape(self):
@@ -89,7 +88,7 @@ class Conv2D:
         self._input_shape = shape
 
     def set_outputs_value_by_matrix(self, matrix):
-        self._input_neurons = matrix
+        self._neurons = matrix
 
     def calculate_output_spatial_size(self):
         if (self._input_shape[0] is not None):
@@ -195,10 +194,10 @@ class Conv2D:
     def detector(self, matrix):
         return [self._activation(row).result for row in matrix]
 
-    def forward_propagation(self, input_neurons):
-        convoluted = self.convolution(input_neurons[0])
-        for i in range(1, len(input_neurons)):
-            temp = self.convolution(input_neurons[i])
+    def forward_propagation(self, neurons):
+        convoluted = self.convolution(neurons[0])
+        for i in range(1, len(neurons)):
+            temp = self.convolution(neurons[i])
             for j in range(len(convoluted)):
                 for k in range(len(convoluted[j])):
                     for l in range(len(convoluted[j][k])):

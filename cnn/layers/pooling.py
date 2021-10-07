@@ -18,7 +18,7 @@ class Pooling:
         self._pool_padding = pool_padding
         self._pool_size = pool_size
 
-        self._input_neurons = []
+        self._neurons = []
         self._input_shape = None
         self._output_shape = None
 
@@ -35,8 +35,8 @@ class Pooling:
         self._name = name
 
     @property
-    def input_neurons(self):
-        return self._input_neurons
+    def neurons(self):
+        return self._neurons
 
     @property
     def input_size(self):
@@ -178,4 +178,4 @@ class Pooling:
         else:
             raise Exception("Undefined pooling mode!")
 
-        self._input_neurons = res
+        self._neurons = res
