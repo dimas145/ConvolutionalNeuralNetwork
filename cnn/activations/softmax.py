@@ -5,6 +5,8 @@ class Softmax():
     def __init__(self, inputs):
         sum = 0
         inputs = list(map(lambda x: math.exp(x), inputs))
+        self._prime_result = []
+
         for input in inputs:
             sum += input
 
@@ -13,3 +15,7 @@ class Softmax():
     @property
     def result(self):
         return self._result
+
+    @property
+    def prime(self):
+        return self._prime_result
