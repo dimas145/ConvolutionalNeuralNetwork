@@ -38,10 +38,12 @@ class Dense:
             raise Exception("Undefined activation")
         self._activation = activation
 
-        self._neurons = [-1] * (self._input_size + 1)
-        # self._net = [-1] * (self._output_size + 1)
-        self._output_neurons = [-1] * (self._output_size + 1)
+        self._input_neurons = [-1] * (self._input_size + 1)
+        # self._nets = [-1] * (self._output_size + 1)
+        self._neurons = [-1] * (self._output_size + 1)
         self._weights = []
+
+        self._dE_dw= None
 
     @property
     def activation(self):
@@ -101,43 +103,45 @@ class Dense:
         for i in range(len(self._weights)):
             self._weights[i].insert(0, bias_weight)
 
+    def set_weights(self, weights):
+        self._weights = weights
+
     def set_outputs_value_by_matrix(self, hk):
-        self._neurons = hk
+        self._input_neurons = hk
 
     def forward_propagation(self, neurons, y=0):
-        self._neurons = neurons
+        self._input_neurons = neurons
         neurons = list(map(lambda x: [x], neurons))
 
         ak = list(
             map(lambda x: x[0], Matrix.mult(self._weights, neurons)))
         hk = self._activation(ak).result
 
-        self._net = ak
-        self._output_neurons = hk
-        # self.set_outputs_value_by_matrix(hk)
+        self._nets = ak
+        self._neurons = hk
 
     def backward_propagation(self, de_do, z, target):
         if z == 1:
             de_do = de_do
-            do_dx = np.array(self._output_neurons) * np.array(
-                [(1 if i == target else 0) - n for i, n in enumerate(self._output_neurons)])
+            do_dx = np.array(self._neurons) * np.array(
+                [(1 if i == target else 0) - n for i, n in enumerate(self._neurons)])
             de_dx = de_do * do_dx
-            dx_dw = [1] + self._neurons[1:]
+            dx_dw = [1] + self._input_neurons[1:]
             de_dw = np.array([de_dx * x for x in dx_dw])
-            self._de_do = np.dot(de_dx, self._weights)
-            self.dx_dw = de_dw
+            self._dE_do = np.dot(de_dx, self._weights)
+            self._dE_dw = de_dw
 
-            print("de_do")
-            print(de_do)
-            print("do_dx")
-            print(do_dx)
-            print("de_dx")
-            print(de_dx)
-            print("dx_dw")
-            print(dx_dw)
-            print("de_dw")
-            print(de_dw)
-            print(self._de_do)
+            # print("de_do")
+            # print(de_do)
+            # print("do_dx")
+            # print(do_dx)
+            # print("de_dx")
+            # print(de_dx)
+            # print("dx_dw")
+            # print(dx_dw)
+            # print("de_dw")
+            # print(de_dw)
+            # print(self._dE_do)
         else:
 
             # de_dnet =  get from other (+1) layer
@@ -146,18 +150,18 @@ class Dense:
             # dx_dw = self._input_neurons
 
             de_do = de_do
-            do_dx = [1] + [1 if x > 0 else 0 for x in self._net]
+            do_dx = [1] + [1 if x > 0 else 0 for x in self._nets]
             de_dx = de_do * do_dx
-            dx_dw = [1] + self._neurons[1:]
+            dx_dw = [1] + self._input_neurons[1:]
             de_dw = np.array([de_dx * x for x in dx_dw])
-            self._de_do = np.dot(de_dx, np.transpose(self._weights))
-            self.dx_dw = de_dw
+            self._dE_do = np.dot(de_dx, np.transpose(self._weights))
+            self._dE_dw = de_dw
 
-            print(do_dx)
-            print(de_dx)
-            print(self._neurons)
-            print(de_dw)
-            print("self dedo")
-            print(de_dx)
-            print(self._weights)
-            print(self._de_do)
+            # print(do_dx)
+            # print(de_dx)
+            # print(self._input_neurons)
+            # print(de_dw)
+            # print("self dedo")
+            # print(de_dx)
+            # print(self._weights)
+            # print(self._dE_do)

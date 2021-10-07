@@ -51,11 +51,38 @@ class Sequential:
             elif (type(self.layers[k]) == Pooling):
                 self.layers[k].pooling(self.layers[k - 1].neurons)
         self.loss = math.log(self.layers[-1].neurons[y])
-        print("LOSS")
-        print(self.loss)
 
-    def backward_propagation(self):
-        pass
+    def backward_propagation(self, y=0):
+        dE_do = -1 / np.array(self.layers[-1]._neurons)
+        last_layer_idx = 0
+
+        for k in range(len(self.layers) - 1, -1, -1):
+            if (type(self.layers[k]) == Dense):
+                if (k == len(self.layers) - 1):
+                    self.layers[k].backward_propagation(dE_do, 1, y)
+                else:
+                    self.layers[k].backward_propagation(self.layers[k + 1]._dE_do, 0, y)
+                last_layer_idx = k
+            elif (type(self.layers[k]) == Conv2D):
+                self.layers[k].backward_propagation(self.layers[last_layer_idx]._dE_do)
+                last_layer_idx = k
+            elif (type(self.layers[k]) == Pooling):
+                self.layers[k].backward_propagation([self.layers[last_layer_idx]._dE_do])
+                last_layer_idx = k
+   
+        print("========================================")
+        print("RESULT")
+        print("========================================")
+        for k in self.layers:
+            if (type(k) == Dense or type(k) == Conv2D or type(k) == Pooling):
+                print(k._name)
+                print(k._dE_do)
+                if(type(k) != Pooling):
+                    print(k._dE_dw)
+            print("----------------------------------------")
+   
+        print("========================================")
+
 
     def summary(self):
         col1 = 35

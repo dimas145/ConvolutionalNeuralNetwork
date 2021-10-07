@@ -106,9 +106,9 @@ class Conv2D:
         self._biases = []
 
         self._weights = []
-        self._dw = None
+        self._dE_dw = None
+        self._dE_do = None
 
-        self.backward_temp = None
     
     def init_layer(self):
         self.calculate_output_spatial_size()
@@ -125,6 +125,9 @@ class Conv2D:
                                  limit,
                                  size=(self._kernel_size[1],
                                        self._kernel_size[0])).tolist())
+
+    def set_weights(self, weights):
+        self._weights = weights
 
     def init_biases(self):
         for _ in range(self._filters):
@@ -302,7 +305,11 @@ class Conv2D:
         # print("RELU_X")
         # print(Utils.ReLU_X(np.array(self._neurons)))
         # print("RESULT")
-        self.backward_temp = Utils.convolution(self._input_neurons[0], chain_matrix * Utils.ReLU_X(np.array(self._neurons)), self._strides) 
-        self._dw = self.backward_temp
-        self._dw_bias = Utils.biases_correction(chain_matrix * Utils.ReLU_X(np.array(self._neurons)))
-        return self._dw, self._dw_bias
+        self._dE_do = (chain_matrix * Utils.ReLU_X(np.array(self._neurons))) * np.array(self._weights)
+        # print("DE/DO WOYYY")
+        # print((chain_matrix * Utils.ReLU_X(np.array(self._neurons))).shape)
+        # print(np.array(self._weights).shape)
+        # print(self._dE_do)
+        self._dE_dw = Utils.convolution(self._input_neurons[0], chain_matrix * Utils.ReLU_X(np.array(self._neurons)), self._strides) 
+        self._dE_dw_bias = Utils.biases_correction(chain_matrix * Utils.ReLU_X(np.array(self._neurons)))
+        return self._dE_dw, self._dE_dw_bias

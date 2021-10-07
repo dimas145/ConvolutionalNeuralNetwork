@@ -92,7 +92,7 @@ class Pooling:
         self._input_shape = None
         self._output_shape = None
 
-        self.backward_temp = None
+        self._dE_do = None
 
     @property
     def output_size(self):
@@ -272,5 +272,5 @@ class Pooling:
         # print("X_RELU")
         # print(Utils.X_ReLU(np.array(self._neurons), np.array(self._nets)))
         # print("CONST MULT MATRIX")
-        self.backward_temp = Utils.constant_mult_matrix(chain_matrix[0], Utils.X_ReLU(np.array(self._neurons), np.array(self._nets))) 
-        return self.backward_temp
+        self._dE_do = Utils.constant_mult_matrix(chain_matrix[0], Utils.X_ReLU(np.array(self._neurons), np.array(self._nets))) 
+        return self._dE_do

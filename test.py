@@ -62,7 +62,7 @@ dense_1.weights = dw1
 dense_1.forward_propagation([0] + flatten._neurons)
 
 # print('Dense 1')
-# print(np.array(dense_1._output_neurons))
+# print(np.array(dense_1._neurons))
 
 dense_2 = layers.Dense(10, activation=activations.Softmax)
 
@@ -82,12 +82,16 @@ dw2 = [
 dense_2.weights = dw2
 
 # print('Dense 2')
-dense_2.forward_propagation([0] + dense_1._output_neurons, 9)
+dense_2.forward_propagation([0] + dense_1._neurons, 9)
 
 
-print(dense_2._output_neurons)
+print(dense_2._neurons)
 
-de_do = -1 / np.array(dense_2._output_neurons)
+de_do = -1 / np.array(dense_2._neurons)
+# print("============")
+# print(de_do)
+# print("============")
+
 dense_2.backward_propagation(de_do, 1, 9)
-dense_1.backward_propagation(dense_2._de_do, 0, 9)
-dense_1.backward_propagation(dense_1._de_do, 0, 9)
+dense_1.backward_propagation(dense_2._dE_do, 0, 9)
+# dense_1.backward_propagation(dense_1._de_do, 0, 9)
