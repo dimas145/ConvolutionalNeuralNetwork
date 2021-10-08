@@ -216,6 +216,27 @@ def propagation():
 
     model.backward_propagation(9)
 
+def propagation_random():
+
+    X = np.random.rand(1, 32, 32).tolist()
+
+    lenet5 = cnn.Sequential()
+
+    lenet5.add(layers.Conv2D(6, (5, 5), activation=activations.ReLU,input_shape=(32, 32, 1)))
+    lenet5.add(layers.Pooling(pool_mode="average"))
+    lenet5.add(layers.Conv2D(16, (3, 3), activation=activations.ReLU))
+    lenet5.add(layers.Pooling(pool_mode="average"))
+    lenet5.add(layers.Flatten())
+    lenet5.add(layers.Dense(120, activation=activations.ReLU))
+    lenet5.add(layers.Dense(84, activation=activations.ReLU))
+    lenet5.add(layers.Dense(10, activation=activations.Softmax))
+
+    lenet5.summary()
+
+    lenet5.forward_propagation(X, 9)
+
+    lenet5.backward_propagation(9)
+
 if __name__ == "__main__":
     # test()
 
@@ -225,4 +246,4 @@ if __name__ == "__main__":
 
     # test_mnist()
 
-    propagation()
+    propagation_random()

@@ -39,7 +39,6 @@ class Dense:
         self._activation = activation
 
         self._input_neurons = [-1] * (self._input_size + 1)
-        # self._nets = [-1] * (self._output_size + 1)
         self._neurons = [-1] * (self._output_size + 1)
         self._weights = []
 
@@ -154,6 +153,10 @@ class Dense:
             de_dx = de_do * do_dx
             dx_dw = [1] + self._input_neurons[1:]
             de_dw = np.array([de_dx * x for x in dx_dw])
+            print("===> de_dx : ")
+            print(np.array(de_dx).shape)
+            print("===> weights : ")
+            print(np.array(self._weights).shape)
             self._dE_do = np.dot(de_dx, np.transpose(self._weights))
             self._dE_dw = de_dw
 
