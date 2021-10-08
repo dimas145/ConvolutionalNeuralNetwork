@@ -130,8 +130,6 @@ def test_mnist():
         plt.imshow(X_train[i], cmap='gray')
         plt.axis('off')
 
-    print("Print Sample:")
-    plt.show()
 
     lenet5 = cnn.Sequential()
 
@@ -218,14 +216,28 @@ def propagation():
 
 def propagation_random():
 
-    X = np.random.rand(1, 32, 32).tolist()
+    (X_train, y_train), (X_test, y_test) = mnist.load_data()
+    X_train = np.array(X_train)
+    X_train = np.pad(X_train, ((0, 0), (2, 2), (2, 2)), 'constant').tolist()
+
+    for i in range(2):
+        plt.subplot(3, 3, i + 1)
+        plt.imshow(X_train[i], cmap='gray')
+        plt.axis('off')
+        
+    for i in range(len(X_train)):
+        for j in range(len(X_train[i])):
+            for k in range(len(X_train[i][j])):
+                X_train[i][j][k] /= 255
+
+    X_train = list(map(lambda x: [x], X_train))
 
     lenet5 = cnn.Sequential()
 
     lenet5.add(layers.Conv2D(6, (5, 5), activation=activations.ReLU,input_shape=(32, 32, 1)))
-    lenet5.add(layers.Pooling(pool_mode="average"))
-    lenet5.add(layers.Conv2D(16, (3, 3), activation=activations.ReLU))
-    lenet5.add(layers.Pooling(pool_mode="average"))
+    lenet5.add(layers.Pooling(pool_mode="max"))
+    # lenet5.add(layers.Conv2D(16, (3, 3), activation=activations.ReLU))
+    # lenet5.add(layers.Pooling(pool_mode="max"))
     lenet5.add(layers.Flatten())
     lenet5.add(layers.Dense(120, activation=activations.ReLU))
     lenet5.add(layers.Dense(84, activation=activations.ReLU))
@@ -233,9 +245,7 @@ def propagation_random():
 
     lenet5.summary()
 
-    lenet5.forward_propagation(X, 9)
-
-    lenet5.backward_propagation(9)
+    lenet5.fit(X_train, y_train)
 
 if __name__ == "__main__":
     # test()
@@ -246,4 +256,5 @@ if __name__ == "__main__":
 
     # test_mnist()
 
+    # propagation()
     propagation_random()

@@ -2,6 +2,8 @@ import sys
 import time
 import math
 import numpy as np
+import random
+import pickle
 
 from .layers import (
     Dense,
@@ -9,7 +11,6 @@ from .layers import (
     Flatten,
     Pooling,
 )
-
 
 class Sequential:
     def __init__(self, layers=None):
@@ -20,6 +21,16 @@ class Sequential:
 
         self.state = {Dense: 0, Conv2D: 0, Flatten: 0, Pooling: 0}
         self.loss = sys.maxsize
+        self.acc = -1
+
+    def save_model(self, path):
+        pickle.dump(self, open(path, "wb"))
+        print("Model saved successfully!")
+
+    def load_model(self, path):
+        res = pickle.load(open(path, "rb"))
+        print("Model loaded successfully!")
+        return res
 
     def add(self, layer):
         if (len(self.layers) != 0):
@@ -50,16 +61,40 @@ class Sequential:
                 self.layers[k].flattening(self.layers[k - 1].neurons)
             elif (type(self.layers[k]) == Pooling):
                 self.layers[k].pooling(self.layers[k - 1].neurons)
-        self.loss = math.log(self.layers[-1].neurons[y])
+        self.loss = -math.log(self.layers[-1].neurons[y])
+
+    def predict(self, X):
+        for k in range(len(self.layers)):
+            if (type(self.layers[k]) == Dense):
+                if (k == 0):
+                    self.layers[k].forward_propagation([0] + X)
+                else:
+                    self.layers[k].forward_propagation([0] + self.layers[k - 1].neurons)
+            elif (type(self.layers[k]) == Conv2D):
+                if (k == 0):
+                    self.layers[k].forward_propagation(X)
+                else:
+                    self.layers[k].forward_propagation(self.layers[k - 1].neurons)
+            elif (type(self.layers[k]) == Flatten):
+                self.layers[k].flattening(self.layers[k - 1].neurons)
+            elif (type(self.layers[k]) == Pooling):
+                self.layers[k].pooling(self.layers[k - 1].neurons)
+
+        for i in range(len(self.layers[-1]._neurons)):
+            if(self.layers[-1]._neurons[i] > maxi):
+                maxi = self.layers[-1]._neurons[i]
+                maxidx = i
+        return maxidx
+
 
     def backward_propagation(self, y=0):
-        dE_do = -1 / np.array(self.layers[-1]._neurons)
+        # dE_do = -1 / np.array(self.layers[-1]._neurons)
         last_layer_idx = 0
 
         for k in range(len(self.layers) - 1, -1, -1):
             if (type(self.layers[k]) == Dense):
                 if (k == len(self.layers) - 1):
-                    self.layers[k].backward_propagation(dE_do, 1, y)
+                    self.layers[k].backward_propagation(None, 1, y)
                 else:
                     self.layers[k].backward_propagation(self.layers[k + 1]._dE_do, 0, y)
                 last_layer_idx = k
@@ -70,19 +105,23 @@ class Sequential:
                 self.layers[k].backward_propagation([self.layers[last_layer_idx]._dE_do])
                 last_layer_idx = k
    
-        print("========================================")
-        print("RESULT")
-        print("========================================")
-        for k in self.layers:
-            if (type(k) == Dense or type(k) == Conv2D or type(k) == Pooling):
-                print(k._name)
-                print(k._dE_do)
-                if(type(k) != Pooling):
-                    print(k._dE_dw)
-            print("----------------------------------------")
+        # print("========================================")
+        # print("RESULT")
+        # print("========================================")
+        # for k in self.layers:
+        #     if (type(k) == Dense or type(k) == Conv2D or type(k) == Pooling):
+        #         print(k._name)
+        #         print(k._dE_do)
+        #         if(type(k) != Pooling):
+        #             print(k._dE_dw)
+        #     print("----------------------------------------")
    
-        print("========================================")
+        # print("========================================")
 
+    def update_weights(self):
+        for x in self.layers:
+            if (type(x) == Dense or type(x) == Conv2D):
+                x._weights = x._weights - (0.001 * x._dE_dw) 
 
     def summary(self):
         col1 = 35
@@ -135,26 +174,47 @@ class Sequential:
         print("Total params: " + "{:,}".format(total_params))
         print()
 
-    def fit(self, X_train, y_train, batch_size=128, epochs=15):
+    def fit(self, X_train, y_train, batch_size=1, epochs=15):
+
 
         if(len(X_train) < batch_size):
             batch_size = len(X_train)
         
-        batch = len(X_train) // batch_size
+        batch = len(X_train)
 
         for i in range(epochs):
             sys.stdout.write("Epoch " + str(i+1) + "/" + str(epochs) + '\n')
             sys.stdout.flush()
+            pred = []
+
+            seq = random.sample(range(len(X_train)), len(X_train))
+            
+            c = 0
             for j in range(batch):
+                c += 1
+                self.forward_propagation(X_train[seq[j]], y_train[seq[j]])
+                maxi = -1
+                maxidx = -1
+                for i in range(len(self.layers[-1]._neurons)):
+                    if(self.layers[-1]._neurons[i] > maxi):
+                        maxi = self.layers[-1]._neurons[i]
+                        maxidx = i
+                pred.append(maxidx)
+                self.backward_propagation(y_train[0])
+
+                count = 0
+                for x in range(len(pred)):
+                    if(pred[x] == y_train[x]):
+                        count += 1
+                self.acc = float(count) / len(pred)
 
                 if(j < batch - 1):
                     loading = ("[" + "=" * int(((j+1) / batch ) * 40)) + "> "
-                    sys.stdout.write("[" + str(j+1) + "/" + str(batch) + "] " + loading + '\r')
+                    sys.stdout.write("[" + str(j+1) + "/" + str(batch) + "] " + loading + "  accuracy: " + str(self.acc) + "  loss: " + str(self.loss) + '\r')
                 else:
                     loading = ("[" + "=" * int(((j+1) / batch ) * 40)) + "] "
-                    sys.stdout.write("[" + str(j+1) + "/" + str(batch) + "] " + loading + '\n')
+                    sys.stdout.write("[" + str(j+1) + "/" + str(batch) + "] " + loading + "  accuracy: " + str(self.acc) + "  loss: " + str(self.loss) + '\n')
                 sys.stdout.flush()
-                time.sleep(0.1)
     
     def weights_summary(self):
         for i in range(len(self.layers)):

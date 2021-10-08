@@ -14,27 +14,36 @@ class Utils:
            x[...] = 1 if x > 0  else 0
         return res
 
-    def X_ReLU(X, ReLU):
-        _X = copy.copy(X)
-        _ReLU = copy.copy(ReLU)
-        for i in range(len(_ReLU)):
-            for j in range(len(_ReLU[i])):
-                for k in range(len(_ReLU[i][j])):
-                    _ReLU[i][j][k] = 1 if _ReLU[i][j][k] == _X[i] else 0                    
-        return _ReLU
+    def X_ReLU(conv, pool, pool_size, strides):
+           
+        _conv = copy.copy(conv)  
 
-    def constant_mult_matrix(m1, m2):
-        resi = []
-        for i in range(len(m2)):
-            resj = []
-            for j in range(len(m2[i])):
-                resk = []
-                for k in range(len(m2[i][j])):
-                    resk.append(m2[i][j][k] * m1[i])
-                resj.append(resk)
-            resi.append(resj)                
-                    
-        return np.array(resi)
+        for z in range(len(_conv)):
+            for i in range(0, len(_conv[z]) - pool_size[0] + 1, strides[0]):
+                for j in range(0, len(_conv[z][i]) - pool_size[1] + 1, strides[1]):
+                    for k in range(pool_size[0]):
+                        for l in range(pool_size[1]):
+                            if(_conv[z][i + k][j + l] == pool[z][i//strides[0]][j//strides[1]]):
+                                _conv[z][i + k][j + l] = 1
+                            else:
+                                _conv[z][i + k][j + l] = 0
+        return np.array(_conv)
+
+    def constant_mult_matrix(conv, pool, pool_size, strides):
+        _conv = conv.tolist()
+        count = 0
+        
+        for z in range(len(_conv)):
+            for i in range(0, len(_conv[z]) - pool_size[0] + 1, strides[0]):
+                for j in range(0, len(_conv[z][i]) - pool_size[1] + 1, strides[1]):
+                    for k in range(pool_size[0]):
+                        for l in range(pool_size[1]):
+                            temp = _conv[z][i + k][j + l] * pool[count]
+                            # print("=> " + str((z, i+k, j+l)) + " " + str(count) + " " + str(temp))
+                            _conv[z][i + k][j + l] = temp
+                    count += 1
+        # print(np.array(_conv))
+        return _conv
 
     def biases_correction(weights):
         res = []
@@ -264,13 +273,19 @@ class Pooling:
     
     def backward_propagation(self, chain_matrix):
         # print("CHAIN MATRIX")
-        # print(chain_matrix[0])
+        # print(np.array(chain_matrix[0]).shape)
+        # print(np.array(chain_matrix[0]))
+
+
         # print("NEURONS")
-        # print(np.array(self._neurons))
+        # print(np.array(self._neurons).shape)
         # print("NETS")
-        # print(np.array(self._nets))
+        # print(np.array(self._nets).shape)
         # print("X_RELU")
-        # print(Utils.X_ReLU(np.array(self._neurons), np.array(self._nets)))
+        dx_do = Utils.X_ReLU(np.array(self._nets), np.array(self._neurons), self._pool_size, self._pool_strides)
+        # print(dx_do.shape)
+        # print(dx_do)
+
         # print("CONST MULT MATRIX")
-        self._dE_do = Utils.constant_mult_matrix(chain_matrix[0], Utils.X_ReLU(np.array(self._neurons), np.array(self._nets))) 
+        self._dE_do = Utils.constant_mult_matrix(dx_do, chain_matrix[0][0][1:], self._pool_size, self._pool_strides) 
         return self._dE_do
